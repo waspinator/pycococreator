@@ -10,14 +10,14 @@ from PIL import Image
 import numpy as np
 from skimage import measure
 from pycocotools import mask
-from pycocoextra import pycocoextra
+from pycococreatortools import pycococreatortools
 
 IMAGE_DIR = 'example_data/images'
 ANNOTATION_DIR = 'example_data/annotations'
 
 INFO = {
-    "description": "ExampleDataset",
-    "url": "https://github.com/waspinator/pycocoextra",
+    "description": "Example Dataset",
+    "url": "https://github.com/waspinator/pycococreator",
     "version": "0.1.0",
     "year": 2018,
     "contributor": "waspinator",
@@ -63,7 +63,7 @@ def main():
         for i, filename in enumerate(files):
             basename_no_extension = os.path.splitext(os.path.basename(filename))[0]
             image = Image.open(filename)
-            image_info = pycocoextra.create_image_info(image_id, os.path.basename(filename), image.size[0], image.size[1])
+            image_info = pycococreatortools.create_image_info(image_id, os.path.basename(filename), image.size[0], image.size[1])
             coco_output["images"].append(image_info)
 
             # go through each associated annotation
@@ -79,7 +79,7 @@ def main():
                     basename_no_extension = os.path.splitext(os.path.basename(filename))[0]
                     binary_mask = np.logical_not(np.array(Image.open(filename))).astype(np.uint8)
                     category_info = {'id': 1, 'is_crowd': 'crowd' in basename_no_extension}
-                    annotation_info = pycocoextra.create_annotation_info(segmentation_id, image_id,
+                    annotation_info = pycococreatortools.create_annotation_info(segmentation_id, image_id,
                         category_info, binary_mask, image.size)
                     coco_output["annotations"].append(annotation_info)
 
