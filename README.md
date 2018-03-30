@@ -6,3 +6,6 @@ pycococreator is a set of tools to help create [COCO](http://cocodataset.org) da
 ![alt text](https://i.imgur.com/iQSPjeC.png "input files")
 ![alt text](https://i.imgur.com/py2aYK9.png "output")
 
+# Install
+
+`python3 setup.py install`
