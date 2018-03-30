@@ -63,7 +63,7 @@ def main():
         for i, filename in enumerate(files):
             basename_no_extension = os.path.splitext(os.path.basename(filename))[0]
             image = Image.open(filename)
-            image_info = pycococreatortools.create_image_info(image_id, os.path.basename(filename), image.size[0], image.size[1])
+            image_info = pycococreatortools.create_image_info(image_id, os.path.basename(filename), image.size)
             coco_output["images"].append(image_info)
 
             # go through each associated annotation
