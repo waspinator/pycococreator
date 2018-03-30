@@ -77,7 +77,7 @@ def main():
 
                 for filename in files:
                     basename_no_extension = os.path.splitext(os.path.basename(filename))[0]
-                    binary_mask = np.logical_not(np.array(Image.open(filename))).astype(np.uint8)
+                    binary_mask = np.asarray(Image.open(filename).convert('1')).astype(np.uint8)
                     category_info = {'id': 1, 'is_crowd': 'crowd' in basename_no_extension}
                     annotation_info = pycococreatortools.create_annotation_info(segmentation_id, image_id,
                         category_info, binary_mask, image.size)
