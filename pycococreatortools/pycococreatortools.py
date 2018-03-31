@@ -32,11 +32,23 @@ def binary_mask_to_rle(binary_mask):
 
     return rle
 
-def binary_mask_to_polygon(binary_mask):
+def binary_mask_to_polygon(binary_mask, tolerance=0):
+    """Converts a binary mask to COCO polygon representation
+
+    Args:
+        binary_mask: a 2D binary numpy array where '1's represent the object
+        tolerance: Maximum distance from original points of polygon to approximated
+            polygonal chain. If tolerance is 0, the original coordinate array is returned.
+
+    """
     polygons = []
-    contours = measure.find_contours(binary_mask, 0.5)
+    # pad mask to close contours of shapes which start and end at an edge
+    padded_binary_mask = np.pad(binary_mask, pad_width=1, mode='constant', constant_values=0)
+    contours = measure.find_contours(padded_binary_mask, 0.5)
+    contours = np.subtract(contours, 1)
     for contour in contours:
         contour = close_contour(contour)
+        contour = measure.approximate_polygon(contour, tolerance)
         contour = np.flip(contour, axis=1)
         segmentation = contour.ravel().tolist()
         polygons.append(segmentation)
@@ -60,7 +72,7 @@ def create_image_info(image_id, file_name, image_size,
 
     return image_info
 
-def create_annotation_info(annotation_id, image_id, category_info, binary_mask, image_size):
+def create_annotation_info(annotation_id, image_id, category_info, binary_mask, image_size, tolerance=0):
     binary_mask = resize_array(binary_mask, image_size)
     binary_mask_encoded = mask.encode(np.asfortranarray(binary_mask.astype(np.uint8)))
     bounding_box = mask.toBbox(binary_mask_encoded)
@@ -86,7 +98,7 @@ def create_annotation_info(annotation_id, image_id, category_info, binary_mask, 
             "iscrowd": 0,
             "area": area.tolist(),
             "bbox": bounding_box.tolist(),
-            "segmentation": binary_mask_to_polygon(binary_mask),
+            "segmentation": binary_mask_to_polygon(binary_mask, tolerance),
             "width": binary_mask.shape[1],
             "height": binary_mask.shape[0]
         }
