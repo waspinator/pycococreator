@@ -78,6 +78,9 @@ def create_annotation_info(annotation_id, image_id, category_info, binary_mask, 
     bounding_box = mask.toBbox(binary_mask_encoded)
     area = mask.area(binary_mask_encoded)
 
+    if area < 1:
+        return None
+
     if category_info["is_crowd"]:
         annotation_info = {
             "id": annotation_id,
