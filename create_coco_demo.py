@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from logzero import logger
 import datetime
 import json
 import os
@@ -8,12 +7,11 @@ import re
 import fnmatch
 from PIL import Image
 import numpy as np
-from skimage import measure
-from pycocotools import mask
 from pycococreatortools import pycococreatortools
 
-IMAGE_DIR = 'example_data/images'
-ANNOTATION_DIR = 'example_data/annotations'
+ROOT_DIR = 'shapes/train/'
+IMAGE_DIR = 'shapes/train/shapes_train2018'
+ANNOTATION_DIR = 'shapes/train/annotations'
 
 INFO = {
     "description": "Example Dataset",
@@ -35,9 +33,19 @@ LICENSES = [
 CATEGORIES = [
     {
         'id': 1,
-        'name': 'blueberry',
-        'supercategory': 'fruit',
-    }
+        'name': 'square',
+        'supercategory': 'shape',
+    },
+    {
+        'id': 2,
+        'name': 'circle',
+        'supercategory': 'shape',
+    },
+    {
+        'id': 3,
+        'name': 'triangle',
+        'supercategory': 'shape',
+    },
 ]
 
 def main():
@@ -78,7 +86,15 @@ def main():
                 for filename in files:
                     basename_no_extension = os.path.splitext(os.path.basename(filename))[0]
                     binary_mask = np.asarray(Image.open(filename).convert('1')).astype(np.uint8)
-                    category_info = {'id': 1, 'is_crowd': 'crowd' in basename_no_extension}
+
+                    if 'square' in basename_no_extension:
+                        class_id = 1
+                    elif 'circle' in basename_no_extension:
+                        class_id = 2
+                    else:
+                        class_id = 3
+
+                    category_info = {'id': class_id, 'is_crowd': 'crowd' in basename_no_extension}
                     annotation_info = pycococreatortools.create_annotation_info(segmentation_id, image_id,
                         category_info, binary_mask, image.size)
                     coco_output["annotations"].append(annotation_info)
@@ -87,7 +103,7 @@ def main():
 
             image_id = image_id + 1
 
-    with open('{}/coco_example.json'.format(ANNOTATION_DIR), 'w') as output_json_file:
+    with open('{}/instances_shape_train2018.json'.format(ROOT_DIR), 'w') as output_json_file:
         json.dump(coco_output, output_json_file)
 
 
