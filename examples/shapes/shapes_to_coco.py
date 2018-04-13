@@ -48,6 +48,25 @@ CATEGORIES = [
     },
 ]
 
+def filter_for_jpeg(root, files):
+    file_types = ['*.jpeg', '*.jpg']
+    file_types = r'|'.join([fnmatch.translate(x) for x in file_types])
+    files = [os.path.join(root, f) for f in files]
+    files = [f for f in files if re.match(file_types, f)]
+    
+    return files
+
+def filter_for_annotations(root, files, image_filename):
+    file_types = ['*.png']
+    file_types = r'|'.join([fnmatch.translate(x) for x in file_types])
+    basename_no_extension = os.path.splitext(os.path.basename(image_filename))[0]
+    file_name_prefix = basename_no_extension + '.*'
+    files = [os.path.join(root, f) for f in files]
+    files = [f for f in files if re.match(file_types, f)]
+    files = [f for f in files if re.match(file_name_prefix, os.path.splitext(os.path.basename(f))[0])]
+
+    return files
+
 def main():
 
     coco_output = {
@@ -61,42 +80,35 @@ def main():
     image_id = 1
     segmentation_id = 1
     
-    for root, directories, files in os.walk(IMAGE_DIR):
-        file_types = ['*.jpeg', '*.jpg']
-        file_types = r'|'.join([fnmatch.translate(x) for x in file_types])
-        files = [os.path.join(root, f) for f in files]
-        files = [f for f in files if re.match(file_types, f)]
+    # filter for jpeg images
+    for root, _, files in os.walk(IMAGE_DIR):
+        image_files = filter_for_jpeg(root, files)
 
         # go through each image
-        for i, filename in enumerate(files):
-            basename_no_extension = os.path.splitext(os.path.basename(filename))[0]
-            image = Image.open(filename)
-            image_info = pycococreatortools.create_image_info(image_id, os.path.basename(filename), image.size)
+        for image_filename in image_files:
+            image = Image.open(image_filename)
+            image_info = pycococreatortools.create_image_info(image_id, os.path.basename(image_filename), image.size)
             coco_output["images"].append(image_info)
 
-            # go through each associated annotation
-            for root, directories, files in os.walk(ANNOTATION_DIR):
-                file_types = ['*.png']
-                file_types = r'|'.join([fnmatch.translate(x) for x in file_types])
-                file_name_prefix = basename_no_extension + '.*'
-                files = [os.path.join(root, f) for f in files]
-                files = [f for f in files if re.match(file_types, f)]
-                files = [f for f in files if re.match(file_name_prefix, os.path.splitext(os.path.basename(f))[0])]
+            # filter for associated png annotations
+            for root, _, files in os.walk(ANNOTATION_DIR):
+                annotation_files = filter_for_annotations(root, files, image_filename)
 
-                for filename in files:
-                    basename_no_extension = os.path.splitext(os.path.basename(filename))[0]
-                    binary_mask = np.asarray(Image.open(filename).convert('1')).astype(np.uint8)
-
-                    if 'square' in basename_no_extension:
+                # go through each associated annotation
+                for annotation_filename in annotation_files:
+                    
+                    if 'square' in image_filename:
                         class_id = 1
-                    elif 'circle' in basename_no_extension:
+                    elif 'circle' in image_filename:
                         class_id = 2
                     else:
                         class_id = 3
 
-                    category_info = {'id': class_id, 'is_crowd': 'crowd' in basename_no_extension}
+                    category_info = {'id': class_id, 'is_crowd': 'crowd' in image_filename}
+                    binary_mask = np.asarray(Image.open(annotation_filename).convert('1')).astype(np.uint8)
+                    
                     annotation_info = pycococreatortools.create_annotation_info(segmentation_id, image_id,
-                        category_info, binary_mask, image.size)
+                        category_info, binary_mask, image.size, tolerance=2)
                     coco_output["annotations"].append(annotation_info)
 
                     segmentation_id = segmentation_id + 1
