@@ -87,7 +87,8 @@ def main():
         # go through each image
         for image_filename in image_files:
             image = Image.open(image_filename)
-            image_info = pycococreatortools.create_image_info(image_id, os.path.basename(image_filename), image.size)
+            image_info = pycococreatortools.create_image_info(
+                image_id, os.path.basename(image_filename), image.size)
             coco_output["images"].append(image_info)
 
             # filter for associated png annotations
@@ -105,10 +106,12 @@ def main():
                         class_id = 3
 
                     category_info = {'id': class_id, 'is_crowd': 'crowd' in image_filename}
-                    binary_mask = np.asarray(Image.open(annotation_filename).convert('1')).astype(np.uint8)
+                    binary_mask = np.asarray(Image.open(annotation_filename)
+                        .convert('1')).astype(np.uint8)
                     
-                    annotation_info = pycococreatortools.create_annotation_info(segmentation_id, image_id,
-                        category_info, binary_mask, image.size, tolerance=2)
+                    annotation_info = pycococreatortools.create_annotation_info(
+                        segmentation_id, image_id, category_info, binary_mask,
+                        image.size, tolerance=2)
                     coco_output["annotations"].append(annotation_info)
 
                     segmentation_id = segmentation_id + 1
