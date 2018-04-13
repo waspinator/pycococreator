@@ -98,9 +98,10 @@ def main():
                 # go through each associated annotation
                 for annotation_filename in annotation_files:
                     
-                    if 'square' in image_filename:
+                    print(annotation_filename)
+                    if 'square' in annotation_filename:
                         class_id = 1
-                    elif 'circle' in image_filename:
+                    elif 'circle' in annotation_filename:
                         class_id = 2
                     else:
                         class_id = 3
