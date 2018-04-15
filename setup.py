@@ -14,6 +14,6 @@ setup(name='pycococreatortools',
     download_url = 'https://github.com/waspinator/pycococreator/archive/0.1.1.tar.gz',
     keywords = ['coco', 'dataset', 'machine-learning'],
     install_requires=[
-        'numpy', 'pillow', 'skimage'
+        'numpy', 'pillow', 'scikit-image'
     ],
 )
