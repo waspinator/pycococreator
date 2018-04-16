@@ -9,9 +9,9 @@ from PIL import Image
 import numpy as np
 from pycococreatortools import pycococreatortools
 
-ROOT_DIR = 'example_data/shapes/train/'
-IMAGE_DIR = 'example_data/shapes/train/shapes_train2018'
-ANNOTATION_DIR = 'example_data/shapes/train/annotations'
+ROOT_DIR = 'train'
+IMAGE_DIR = os.path.join(ROOT_DIR, "shapes_train2018")
+ANNOTATION_DIR = os.path.join(ROOT_DIR, "annotations")
 
 INFO = {
     "description": "Example Dataset",
@@ -113,7 +113,9 @@ def main():
                     annotation_info = pycococreatortools.create_annotation_info(
                         segmentation_id, image_id, category_info, binary_mask,
                         image.size, tolerance=2)
-                    coco_output["annotations"].append(annotation_info)
+
+                    if annotation_info is not None:
+                        coco_output["annotations"].append(annotation_info)
 
                     segmentation_id = segmentation_id + 1
 
