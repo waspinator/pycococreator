@@ -51,6 +51,12 @@ def binary_mask_to_polygon(binary_mask, tolerance=0):
         contour = measure.approximate_polygon(contour, tolerance)
         contour = np.flip(contour, axis=1)
         segmentation = contour.ravel().tolist()
+        # cocoapi treats segmentations with length 4 as bounding boxes instead of polygons
+        # https://github.com/cocodataset/cocoapi/blob/master/PythonAPI/pycocotools/_mask.pyx#L292
+        if len(segmentation) == 4:
+            segmentation.append(segmentation[-1])
+        # after padding and subtracting 1 we may get -0.5 points in our segmentation 
+        segmentation = [0 if i < 0 else i for i in segmentation]
         polygons.append(segmentation)
 
     return polygons
