@@ -6,7 +6,7 @@ from distutils.extension import Extension
 setup(name='pycococreatortools',
     packages=['pycococreatortools'],
     package_dir = {'pycococreatortools': 'pycococreatortools'},
-    version='0.1.1',
+    version='0.1.5',
     description = 'Tools to create COCO datasets',
     url = 'https://github.com/waspinator/pycococreator',
     author = 'waspinator',
