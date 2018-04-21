@@ -49,7 +49,7 @@ def binary_mask_to_polygon(binary_mask, tolerance=0):
     for contour in contours:
         contour = close_contour(contour)
         contour = measure.approximate_polygon(contour, tolerance)
-        if len(contour < 3):
+        if len(contour) < 3:
             continue
         contour = np.flip(contour, axis=1)
         segmentation = contour.ravel().tolist()
@@ -86,28 +86,24 @@ def create_annotation_info(annotation_id, image_id, category_info, binary_mask, 
         return None
 
     if category_info["is_crowd"]:
-        annotation_info = {
-            "id": annotation_id,
-            "image_id": image_id,
-            "category_id": category_info["id"],
-            "iscrowd": 1,
-            "area": area.tolist(),
-            "bbox": bounding_box.tolist(),
-            "segmentation": binary_mask_to_rle(binary_mask),
-            "width": binary_mask.shape[1],
-            "height": binary_mask.shape[0],
-        } 
-    else:
-        annotation_info = {
-            "id": annotation_id,
-            "image_id": image_id,
-            "category_id": category_info["id"],
-            "iscrowd": 0,
-            "area": area.tolist(),
-            "bbox": bounding_box.tolist(),
-            "segmentation": binary_mask_to_polygon(binary_mask, tolerance),
-            "width": binary_mask.shape[1],
-            "height": binary_mask.shape[0]
-        }
+        is_crowd = 1
+        segmentation = binary_mask_to_rle(binary_mask)
+    else :
+        is_crowd = 0
+        segmentation = binary_mask_to_polygon(binary_mask, tolerance)
+        if not segmentation:
+            return None
+
+    annotation_info = {
+        "id": annotation_id,
+        "image_id": image_id,
+        "category_id": category_info["id"],
+        "iscrowd": is_crowd,
+        "area": area.tolist(),
+        "bbox": bounding_box.tolist(),
+        "segmentation": segmentation,
+        "width": binary_mask.shape[1],
+        "height": binary_mask.shape[0],
+    } 
 
     return annotation_info
