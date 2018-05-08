@@ -9,4 +9,4 @@ Read more here https://patrickwasp.com/create-your-own-coco-style-dataset/
 
 # Install
 
-`python3 setup.py install`
+`pip install git+git://github.com/waspinator/pycococreator.git@0.1.5`
