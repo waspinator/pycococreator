@@ -12,10 +12,10 @@ from pycocotools import mask
 convert = lambda text: int(text) if text.isdigit() else text.lower()
 natrual_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
 
-def resize_array(array, new_size):
-    image = Image.fromarray(array)
+def resize_binary_mask(array, new_size):
+    image = Image.fromarray(array.astype(np.uint8)*255)
     image = image.resize(new_size)
-    return np.asarray(image)
+    return np.asarray(image).astype(np.bool_)
 
 def close_contour(contour):
     if not np.array_equal(contour[0], contour[-1]):
@@ -76,14 +76,20 @@ def create_image_info(image_id, file_name, image_size,
 
     return image_info
 
-def create_annotation_info(annotation_id, image_id, category_info, binary_mask, image_size, tolerance=0):
-    binary_mask = resize_array(binary_mask, image_size)
-    binary_mask_encoded = mask.encode(np.asfortranarray(binary_mask.astype(np.uint8)))
-    bounding_box = mask.toBbox(binary_mask_encoded)
-    area = mask.area(binary_mask_encoded)
+def create_annotation_info(annotation_id, image_id, category_info, binary_mask, 
+                           image_size=None, tolerance=2, bounding_box=None):
 
+    if image_size is not None:
+        binary_mask = resize_binary_mask(binary_mask, image_size)
+
+    binary_mask_encoded = mask.encode(np.asfortranarray(binary_mask.astype(np.uint8)))
+
+    area = mask.area(binary_mask_encoded)
     if area < 1:
         return None
+
+    if bounding_box is None:
+        bounding_box = mask.toBbox(binary_mask_encoded)
 
     if category_info["is_crowd"]:
         is_crowd = 1

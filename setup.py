@@ -6,12 +6,12 @@ from distutils.extension import Extension
 setup(name='pycococreatortools',
     packages=['pycococreatortools'],
     package_dir = {'pycococreatortools': 'pycococreatortools'},
-    version='0.1.5',
+    version='0.2.0',
     description = 'Tools to create COCO datasets',
     url = 'https://github.com/waspinator/pycococreator',
     author = 'waspinator',
     author_email = 'patrickwasp@gmail.com',
-    download_url = 'https://github.com/waspinator/pycococreator/archive/0.1.5.tar.gz',
+    download_url = 'https://github.com/waspinator/pycococreator/archive/0.2.0.tar.gz',
     keywords = ['coco', 'dataset', 'machine-learning'],
     install_requires=[
         'numpy', 'pillow', 'scikit-image'
