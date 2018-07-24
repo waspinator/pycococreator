@@ -99,12 +99,7 @@ def main():
                 for annotation_filename in annotation_files:
                     
                     print(annotation_filename)
-                    if 'square' in annotation_filename:
-                        class_id = 1
-                    elif 'circle' in annotation_filename:
-                        class_id = 2
-                    else:
-                        class_id = 3
+                    class_id = [x['id'] for x in CATEGORIES if x['name'] in annotation_filename][0]
 
                     category_info = {'id': class_id, 'is_crowd': 'crowd' in image_filename}
                     binary_mask = np.asarray(Image.open(annotation_filename)
