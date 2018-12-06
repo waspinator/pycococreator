@@ -81,6 +81,7 @@ def main():
     segmentation_id = 1
     
     # filter for jpeg images
+    # filter for jpeg images
     for root, _, files in os.walk(IMAGE_DIR):
         image_files = filter_for_jpeg(root, files)
 
@@ -97,20 +98,18 @@ def main():
 
                 # go through each associated annotation
                 for annotation_filename in annotation_files:
-                    
+
                     print(annotation_filename)
                     class_id = [x['id'] for x in CATEGORIES if x['name'] in annotation_filename][0]
-
                     category_info = {'id': class_id, 'is_crowd': 'crowd' in image_filename}
-                    binary_mask = np.asarray(Image.open(annotation_filename)
-                        .convert('1')).astype(np.uint8)
-                    
-                    annotation_info = pycococreatortools.create_annotation_info(
+                    binary_mask = np.asarray(Image.open(annotation_filename)).astype(np.uint8)
+
+                    annotation_info, segmentation_id = pycococreatortools.create_annotation_info(
                         segmentation_id, image_id, category_info, binary_mask,
                         image.size, tolerance=2)
 
                     if annotation_info is not None:
-                        coco_output["annotations"].append(annotation_info)
+                        coco_output["annotations"] += annotation_info
 
                     segmentation_id = segmentation_id + 1
 
