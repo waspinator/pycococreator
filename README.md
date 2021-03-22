@@ -1,5 +1,9 @@
 # pycococreator
 
+
+Please site using: [![DOI](https://zenodo.org/badge/127320367.svg)](https://zenodo.org/badge/latestdoi/127320367)
+
+
 pycococreator is a set of tools to help create [COCO](http://cocodataset.org) datasets. It includes functions to generate annotations in uncompressed RLE ("crowd") and polygons in the format COCO requires.
 
 Read more here https://patrickwasp.com/create-your-own-coco-style-dataset/
