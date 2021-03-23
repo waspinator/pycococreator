@@ -105,3 +105,7 @@ ENV/
 MANIFEST
 
 \.vscode/
+
+#pycharm
+
+.idea/

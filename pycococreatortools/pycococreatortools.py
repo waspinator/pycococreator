@@ -76,6 +76,32 @@ def create_image_info(image_id, file_name, image_size,
 
     return image_info
 
+def create_bounding_box(segmentation,bounding_box):
+
+    if len(segmentation)<2:
+        return bounding_box
+
+    x=[]
+    y=[]
+    bounding_box = []
+    for seg in segmentation:
+        for i in range(0,len(seg)-1,2):
+            x.append(seg[i])
+            y.append(seg[i+1])
+
+        x_min = np.array(x).min()
+        x_max = np.array(x).max()
+        y_min = np.array(y).min()
+        y_max = np.array(y).max()
+
+        w = x_max - x_min
+        h = y_max - y_min
+        x=[]
+        y=[]
+        bounding_box.append(np.array([x_min,y_min,w,h]))
+
+    return np.array(bounding_box)
+
 def create_annotation_info(annotation_id, image_id, category_info, binary_mask, 
                            image_size=None, tolerance=2, bounding_box=None):
 
@@ -99,17 +125,37 @@ def create_annotation_info(annotation_id, image_id, category_info, binary_mask,
         segmentation = binary_mask_to_polygon(binary_mask, tolerance)
         if not segmentation:
             return None
+    # Sometimes 1 mask contain several same class items. This modification can help generate valid annotation info for muliple mask and bbox
+    bounding_box = create_bounding_box(segmentation,bounding_box)
+    annotations = []
+    if len(segmentation) > 1:
+        for i in range(len(segmentation)):
+            annotation_info = {
+                "id": annotation_id+i,
+                "image_id": image_id,
+                "category_id": category_info["id"],
+                "iscrowd": is_crowd,
+                "area": area.tolist(),
+                "bbox": bounding_box[i].tolist(),
+                "segmentation": [segmentation[i]],
+                "width": binary_mask.shape[1],
+                "height": binary_mask.shape[0],
+            }
+            annotations.append(annotation_info)
+        annotation_id+=(len(segmentation)-1)
+    else:
+        annotation_info = {
+            "id": annotation_id,
+            "image_id": image_id,
+            "category_id": category_info["id"],
+            "iscrowd": is_crowd,
+            "area": area.tolist(),
+            "bbox": bounding_box.tolist(),
+            "segmentation": segmentation,
+            "width": binary_mask.shape[1],
+            "height": binary_mask.shape[0],
+        }
+        annotations.append(annotation_info)
 
-    annotation_info = {
-        "id": annotation_id,
-        "image_id": image_id,
-        "category_id": category_info["id"],
-        "iscrowd": is_crowd,
-        "area": area.tolist(),
-        "bbox": bounding_box.tolist(),
-        "segmentation": segmentation,
-        "width": binary_mask.shape[1],
-        "height": binary_mask.shape[0],
-    } 
 
-    return annotation_info
+    return annotations,annotation_id
