@@ -13,7 +13,7 @@ Read more here https://patrickwasp.com/create-your-own-coco-style-dataset/
 
 # Install
 
-`pip install git+git://github.com/waspinator/pycococreator.git@0.2.0`
+`pip install git+https://github.com/waspinator/pycococreator.git@0.2.0`
 
 If you need to install pycocotools for python 3, try the following:
 
