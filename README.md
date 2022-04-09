@@ -20,5 +20,5 @@ If you need to install pycocotools for python 3, try the following:
 ```
 sudo apt-get install python3-dev
 pip install cython
-pip install git+git://github.com/waspinator/coco.git@2.1.0
+pip install git+https://github.com/waspinator/coco.git@2.1.0
 ```
